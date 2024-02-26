@@ -1,4 +1,5 @@
-import pygame, random
+import pygame
+import random
 from pygame.locals import *
 
 # Função para gerar coordenadas aleatórias em uma grade
@@ -6,7 +7,7 @@ def on_grid_random():
     x = random.randint(0, 59)
     y = random.randint(0, 59)
     while True:
-        # Verifica se as coordenadas geradas não colidem com a cobra
+        # Verifica se as coordenadas geradas não estão sobre a cobra cobra
         for c in range(0, len(snake)):
             if snake[c][0] == x and snake[0][c]:
                 # Se houver colisão, gera novas coordenadas
@@ -70,8 +71,6 @@ screen = pygame.display.set_mode((600, 630))
 
 # Inicializa a posição inicial da cobra e da maçã
 snake = [(300, 300), (310, 300), (320, 300), (330, 300)]
-snake_skin = pygame.Surface((10, 10))
-snake_skin.fill((255, 255, 255))
 apple_pos = on_grid_random()
 apple = pygame.Surface((10, 10))
 apple.fill((255, 0, 0))
@@ -161,18 +160,27 @@ while True:
     elif snake[0][1] == 590 and my_direction == DOWN:
         my_direction == DOWN
         snake[0] = (snake[0][0], -10)
-
+    """
+    
     # Verifica se a cobra colidiu consigo mesma e se perdeu
     for seg in snake[1:]:
         if collision(seg, snake[0]):
             lose()
-    """
+
     # Desenha os elementos na tela
     screen.fill((0, 0, 0))
     screen.blit(score_background, (0, 600))
     screen.blit(apple, apple_pos)
     screen.blit(ScoreAndTime_txt, txtRect)
-    
-    for pos in snake:
-        screen.blit(snake_skin, pos)
+
+    # Desenha a cobra com uma variação de cor
+    for i, pos in enumerate(snake):
+        # Calcula a cor intermediária entre amarelo e azul com base no índice do segmento
+        fraction = i / (len(snake) - 1)
+        color = (255, int(255 * (1 - fraction)), int(242 * fraction))  # Variação de cor entre amarelo e azul
+        # Desenha o segmento da cobra com a cor calculada
+        snake_segment = pygame.Surface((10, 10))
+        snake_segment.fill(color)
+        screen.blit(snake_segment, pos)
+
     pygame.display.update()
