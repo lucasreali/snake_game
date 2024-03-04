@@ -1,5 +1,4 @@
-import pygame
-import random
+import pygame, random
 from pygame.locals import *
 
 # Função para gerar coordenadas aleatórias em uma grade
@@ -23,7 +22,7 @@ def collision(x, y):
 
 # Função para lidar com o evento de perda do jogo
 def lose():
-    global game_over
+    global game_over, cronometer, score
     # Preenche a tela com vermelho
     screen.fill((255, 0, 0))
     # Define a fonte e renderiza o texto "YOU LOSE"
@@ -52,12 +51,12 @@ def lose():
 
 # Função para redefinir o jogo após o jogador perder
 def reset_game():
-    global snake, my_direction, apple_pos, score
+    global snake, my_direction, apple_pos, score, cronometer
     # Reinicia a posição da cobra, a direção, a posição da maçã e a pontuação
     snake = [(300, 300), (310, 300), (320, 300), (330, 300)]
     my_direction = LEFT
     apple_pos = on_grid_random()
-    score = 0
+    score = cronometer = 0
 
 # Definição de constantes para direções
 UP = 0
@@ -76,7 +75,7 @@ apple = pygame.Surface((10, 10))
 apple.fill((255, 0, 0))
 
 # Inicializa as variáveis de pontuação, tempo e texto de pontuação/tempo
-score = cont = cronometer = 0
+score = cronometer = 0
 fontsys = pygame.font.SysFont(None, 20)
 ScoreAndTime_txt = fontsys.render(f"Score: {score} | Time: {cronometer}", True, (255, 255, 255))
 txtRect = ScoreAndTime_txt.get_rect()
@@ -93,19 +92,22 @@ game_over = False
 my_direction = LEFT
 
 # Define a taxa de atualização do jogo
-clock_tick = 20
+clock_tick = 25
 clock = pygame.time.Clock()
+
+cont_timer = cont_move = 0
 
 # Loop principal do jogo
 while True:
     clock.tick(clock_tick)
-    cont += 1
+    cont_timer += 1
+    cont_move += 1
 
     # Loop para lidar com eventos de entrada do usuário
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
-        elif event.type == KEYDOWN:
+        elif event.type == KEYDOWN and cont_move != 0:
             if event.key == K_UP and my_direction != DOWN:
                 my_direction = UP
             elif event.key == K_RIGHT and my_direction != LEFT:
@@ -115,6 +117,8 @@ while True:
             elif event.key == K_LEFT and my_direction != RIGHT:
                 my_direction = LEFT
 
+            cont_move = 0
+
     # Verifica se a cobra colidiu com a maçã e atualiza a pontuação
     if collision(snake[0], apple_pos):
         apple_pos = on_grid_random()
@@ -123,10 +127,10 @@ while True:
         ScoreAndTime_txt = fontsys.render(f"Score: {score} | Time: {cronometer}", 1, (255, 255, 255))
 
     # Atualiza o cronômetro
-    if cont % clock_tick == 0:
+    if cont_timer % clock_tick == 0:
         cronometer += 1
         ScoreAndTime_txt = fontsys.render(f"Score: {score} | Time: {cronometer}", 1, (255, 255, 255))
-        cont = 0
+        cont_timer = 0
 
     # Move os segmentos da cobra
     for c in range(len(snake) - 1, 0, -1):
@@ -143,24 +147,23 @@ while True:
         snake[0] = (snake[0][0] - 10, snake[0][1])
 
     # Verifica se a cobra colidiu com as paredes e se perdeu
-    if snake[0][0] < 0 or snake[0][0] >= 600 or snake[0][1] < 0 or snake[0][1] >= 600:
-        lose()
+    # if snake[0][0] < 0 or snake[0][0] >= 600 or snake[0][1] < 0 or snake[0][1] >= 600:
+    #     lose()
     
-    # Quando a cobra encotar em uma parade ela aparece no outro lado
-    """
-    if snake[0][0] == 590 and my_direction == RIGHT:
+    # Quando a cobra encotar em uma parade ela aparece no outro lado  
+    if snake[0][0] == 600 and my_direction == RIGHT:
         my_direction == RIGHT
-        snake[0] = (-10, snake[0][1])
-    elif snake[0][0] == 0 and my_direction == LEFT:
+        snake[0] = (0, snake[0][1])
+    elif snake[0][0] == -10 and my_direction == LEFT:
         my_direction == LEFT
         snake[0] = (590, snake[0][1])
-    elif snake[0][1] == 0 and my_direction == UP:
+    elif snake[0][1] == -10 and my_direction == UP:
         my_direction == UP
-        snake[0] = (snake[0][0], 600)
-    elif snake[0][1] == 590 and my_direction == DOWN:
+        snake[0] = (snake[0][0], 590)
+    elif snake[0][1] == 600 and my_direction == DOWN:
         my_direction == DOWN
-        snake[0] = (snake[0][0], -10)
-    """
+        snake[0] = (snake[0][0], 0)
+    
     
     # Verifica se a cobra colidiu consigo mesma e se perdeu
     for seg in snake[1:]:
@@ -182,5 +185,7 @@ while True:
         snake_segment = pygame.Surface((10, 10))
         snake_segment.fill(color)
         screen.blit(snake_segment, pos)
+
+    print(snake[0])
 
     pygame.display.update()
