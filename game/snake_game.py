@@ -23,17 +23,20 @@ def collision(x, y):
 # Função para lidar com o evento de perda do jogo
 def lose():
     global game_over, cronometer, score
+    
     # Preenche a tela com vermelho
     screen.fill((255, 0, 0))
+
     # Define a fonte e renderiza o texto "YOU LOSE"
     font = pygame.font.SysFont(None, 48)
     lose_text = font.render("YOU LOSE", True, (255, 255, 255))
     text_rect = lose_text.get_rect(center=(300, 200))
     screen.blit(lose_text, text_rect)
+
     # Desenha um botão "Play Again"
     game_over = True
-    pygame.draw.rect(screen, (0, 255, 0), (200, 350, 200, 50))
-    button_text = font.render("Play Again", True, (255, 255, 255))
+    pygame.draw.rect(screen, (0, 255, 0), (190, 350, 225, 50))
+    button_text = font.render("Press SPACE", True, (255, 255, 255))
     button_rect = button_text.get_rect(center=(300, 375))
     screen.blit(button_text, button_rect)
     pygame.display.update()
@@ -43,9 +46,8 @@ def lose():
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
-            elif event.type == MOUSEBUTTONDOWN:
-                mouse_x, mouse_y = pygame.mouse.get_pos()
-                if 200 <= mouse_x <= 400 and 350 <= mouse_y <= 400:
+            elif event.type == KEYDOWN:
+                if event.key == K_SPACE:
                     reset_game()
                     game_over = False
 
@@ -147,22 +149,22 @@ while True:
         snake[0] = (snake[0][0] - 10, snake[0][1])
 
     # Verifica se a cobra colidiu com as paredes e se perdeu
-    # if snake[0][0] < 0 or snake[0][0] >= 600 or snake[0][1] < 0 or snake[0][1] >= 600:
-    #     lose()
+    if snake[0][0] < 0 or snake[0][0] >= 600 or snake[0][1] < 0 or snake[0][1] >= 600:
+        lose()
     
-    # Quando a cobra encotar em uma parade ela aparece no outro lado  
-    if snake[0][0] == 600 and my_direction == RIGHT:
-        my_direction == RIGHT
-        snake[0] = (0, snake[0][1])
-    elif snake[0][0] == -10 and my_direction == LEFT:
-        my_direction == LEFT
-        snake[0] = (590, snake[0][1])
-    elif snake[0][1] == -10 and my_direction == UP:
-        my_direction == UP
-        snake[0] = (snake[0][0], 590)
-    elif snake[0][1] == 600 and my_direction == DOWN:
-        my_direction == DOWN
-        snake[0] = (snake[0][0], 0)
+    # Quando a cobra encotar em uma parade ela aparece no outro lado
+    # if snake[0][0] == 600 and my_direction == RIGHT:
+    #     my_direction == RIGHT
+    #     snake[0] = (0, snake[0][1])
+    # elif snake[0][0] == -10 and my_direction == LEFT:
+    #     my_direction == LEFT
+    #     snake[0] = (590, snake[0][1])
+    # elif snake[0][1] == -10 and my_direction == UP:
+    #     my_direction == UP
+    #     snake[0] = (snake[0][0], 590)
+    # elif snake[0][1] == 600 and my_direction == DOWN:
+    #     my_direction == DOWN
+    #     snake[0] = (snake[0][0], 0)
     
     
     # Verifica se a cobra colidiu consigo mesma e se perdeu
